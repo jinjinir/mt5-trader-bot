@@ -14,8 +14,8 @@ buy_vol = 2.0  # float. lot size to buy
 buy_sl = 29000.0  # flaot. stop loss
 buy_tp = 33000.0  # float. take profit
 sell_vol = 1.0  # float. lot size to sell
-sell_sl = 29000.0  # flaot. stop loss
-sell_tp = 33000.0  # float. take profit
+sell_sl = 33000.0  # flaot. stop loss
+sell_tp = 29000.0  # float. take profit
 
 # start the platform with initialize()
 mt.initialize()
@@ -136,6 +136,8 @@ deal_hisotry
 # https://www.mql5.com/en/docs/integration/python_metatrader5/mt5ordersend_py
 
 # ensure algo trading option is enabled in MT5 to trade with python
+
+# open order either to buy
 request = {
     "action": mt.TRADE_ACTION_DEAL,
     "symbol": symbol,  # change as needed
@@ -148,7 +150,27 @@ request = {
     "magic": 23400,  # integer. used to identify advisor/strategies
     # and can be seen in the comments as "expert ID"
     "comment": "python script open",
-    "type_time": mt.ORDER_TIME_GTC,
+    "type_time": mt.ORDER_TIME_GTC,  # order stays until manually cancelled
+    "type_filling": mt.ORDER_FILLING_IOC,
+}
+
+order = mt.order_send(request)
+print(order)
+
+# open order to sell
+request = {
+    "action": mt.TRADE_ACTION_DEAL,
+    "symbol": symbol,
+    "volume": sell_vol,
+    "type": mt.ORDER_TYPE_SELL,
+    "price": mt.symbol_info_tick(symbol).ask,
+    "sl": sell_sl,
+    "tp": sell_tp,
+    "deviation": 20,  # integer
+    "magic": 23400,  # used to identify advisor/strategies
+    # and can be seen in the comments as "expert ID"
+    "comment": "python script open",
+    "type_time": mt.ORDER_TIME_GTC,  # order stays until manually cancelled
     "type_filling": mt.ORDER_FILLING_IOC,
 }
 
@@ -156,22 +178,39 @@ order = mt.order_send(request)
 print(order)
 
 # ensure algo trading option is enabled in MT5 to trade with python
-# close position
+
+# close buy position
 request = {
     "action": mt.TRADE_ACTION_DEAL,
     "symbol": symbol,
     "volume": sell_vol,
     "type": mt.ORDER_TYPE_SELL,
-    "position": 12345678,  # select the position you want to close.
+    "position": 12345678,  # select the order ID you want to close.
     # needs to be automated?
     "price": mt.symbol_info_tick(symbol).ask,
-    "sl": sell_sl,
-    "tp": sell_tp,
-    "deviation": 20,  # integer
     "magic": 23400,  # used to identify advisor/strategies
     # and can be seen in the comments as "expert ID"
     "comment": "python script close",
-    "type_time": mt.ORDER_TIME_GTC,
+    "type_time": mt.ORDER_TIME_GTC,  # order stays until manually cancelled
+    "type_filling": mt.ORDER_FILLING_IOC,
+}
+
+order = mt.order_send(request)
+print(order)
+
+# close sell position
+request = {
+    "action": mt.TRADE_ACTION_DEAL,
+    "symbol": symbol,
+    "volume": sell_vol,
+    "type": mt.ORDER_TYPE_BUY,
+    "position": 12345678,  # select the order ID you want to close.
+    # needs to be automated?
+    "price": mt.symbol_info_tick(symbol).ask,
+    "magic": 23400,  # used to identify advisor/strategies
+    # and can be seen in the comments as "expert ID"
+    "comment": "python script close",
+    "type_time": mt.ORDER_TIME_GTC,  # order stays until manually cancelled
     "type_filling": mt.ORDER_FILLING_IOC,
 }
 
