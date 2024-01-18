@@ -23,11 +23,12 @@ buy_sl = buy_price * (1-sl_pct)  # float. stop loss
 buy_tp = buy_price * (1+tp_pct)  # float. take profit
 sell_sl = sell_price * (1+sl_pct)  # flaot. stop loss
 sell_tp = sell_price * (1-tp_pct)  # float. take profit
-interval = mt.TIMEFRAME_D1  # change timeframe
 timeframe = mt.TIMEFRAME_M1  # change timeframe
 date_to = datetime.now()
 date_from = datetime(2023, 1, 1)
 no_of_rows = 100
+prices = pd.DataFrame(mt.copy_rates_range(
+    ticker, timeframe, date_from, date_to))
 
 # start the platform with initialize()
 mt.initialize()
@@ -96,7 +97,7 @@ def close_order(ticker, qty, order_type, price):
     return order
 
 # historical rates
-# rates = mt.copy_rates_from(ticker,interval,date_to,no_of_rows)
+# rates = mt.copy_rates_from(ticker,timeframe,date_to,no_of_rows)
 # rates
 
 
@@ -104,13 +105,14 @@ def close_order(ticker, qty, order_type, price):
 # uncomment for loop and comment while loop to run script only 100 times.
 while True:  # runs the script indefinitely
     # for i in range(100):
+
     ohlc = pd.DataFrame(mt.copy_rates_range(
         ticker, timeframe, date_from, date_to))
     ohlc['time'] = pd.to_datetime(ohlc['time'], unit='s')
-    ohlc
+    # ohlc
 
     fig = px.line(ohlc, x=ohlc['time'], y=ohlc['close'])
-    fig.show
+    # fig.show
 
     # pine script
     # LongCondition = close > high[1]
