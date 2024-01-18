@@ -18,10 +18,10 @@ buy_price = mt.symbol_info_tick(ticker).ask
 sell_price = mt.symbol_info_tick(tikcer).bid
 sl_pct = 0.05  # stop loss percent
 tp_pct = 0.1  # take profit percent
-buy_sl = buy_price * (1-sl)# flaot. stop loss
-buy_tp = buy_price * (1+tp) # float. take profit
-sell_sl = sell_price * (1+sl)  # flaot. stop loss
-sell_tp = sell_price * (1-tp)  # float. take profit
+buy_sl = buy_price * (1-sl_pct)# flaot. stop loss
+buy_tp = buy_price * (1+tp_pct) # float. take profit
+sell_sl = sell_price * (1+sl_pct)  # flaot. stop loss
+sell_tp = sell_price * (1-tp_pct)  # float. take profit
 
 # start the platform with initialize()
 mt.initialize()
@@ -48,3 +48,40 @@ print()
 print('login: ', login_number)
 print('balance: ', balance)
 print('equity: ', equity)
+
+def create_order(ticker, qty, order_type, price, sl, tp):
+  request = {
+    "action": mt.TRADE_ACTION_DEAL,
+    "symbol": ticker,
+    "volume": qty,
+    "type": order_type,
+    # needs to be automated?
+    "price": sell_price,
+    "sl": sl,
+    "tp": tp,
+    "magic": 23400,  # used to identify advisor/strategies
+    # and can be seen in the comments as "expert ID"
+    "comment": "python script open",
+    "type_time": mt.ORDER_TIME_GTC,  # order stays until manually cancelled
+    "type_filling": mt.ORDER_FILLING_IOC,
+  }
+  order = mt.order_send(request)
+  return order
+
+def close_order(ticker, qty, order_type, price):
+  request = {
+    "action": mt.TRADE_ACTION_DEAL,
+    "symbol": ticker,
+    "volume": qty,
+    "type": order_type,
+    "position": mt.positions_get()[0]._asdict()['ticket'],  # select the order ID you want to close.
+    # needs to be automated?
+    "price": sell_price,
+    "magic": 23400,  # used to identify advisor/strategies
+    # and can be seen in the comments as "expert ID"
+    "comment": "python script close",
+    "type_time": mt.ORDER_TIME_GTC,  # order stays until manually cancelled
+    "type_filling": mt.ORDER_FILLING_IOC,
+  }
+  order = mt.order_send(request)
+  return order
