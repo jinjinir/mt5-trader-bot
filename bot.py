@@ -16,7 +16,7 @@ qty = 2.0  # float. lot size to buy
 buy_order_type = mt.ORDER_TYPE_BUY
 sell_order_type = mt.ORDER_TYPE_SELL
 buy_price = mt.symbol_info_tick(ticker).ask
-sell_price = mt.symbol_info_tick(tikcer).bid
+sell_price = mt.symbol_info_tick(ticker).bid
 sl_pct = 0.05  # stop loss percent
 tp_pct = 0.1  # take profit percent
 buy_sl = buy_price * (1-sl_pct)  # float. stop loss
@@ -24,7 +24,9 @@ buy_tp = buy_price * (1+tp_pct)  # float. take profit
 sell_sl = sell_price * (1+sl_pct)  # flaot. stop loss
 sell_tp = sell_price * (1-tp_pct)  # float. take profit
 interval = mt.TIMEFRAME_D1  # change timeframe
-from_date = datetime.now()
+timeframe = mt.TIMEFRAME_M1  # change timeframe
+date_to = datetime.now()
+date_from = datetime(2023, 1, 1)
 no_of_rows = 100
 
 # start the platform with initialize()
@@ -94,7 +96,7 @@ def close_order(ticker, qty, order_type, price):
     return order
 
 # historical rates
-# rates = mt.copy_rates_from(ticker,interval,from_date,no_of_rows)
+# rates = mt.copy_rates_from(ticker,interval,date_to,no_of_rows)
 # rates
 
 
@@ -103,7 +105,7 @@ def close_order(ticker, qty, order_type, price):
 while True:  # runs the script indefinitely
     # for i in range(100):
     ohlc = pd.DataFrame(mt.copy_rates_range(
-        ticker, mt.TIMEFRAME_M1, datetime(2023, 1, 1), from_date))
+        ticker, timeframe, date_from, date_to))
     ohlc['time'] = pd.to_datetime(ohlc['time'], unit='s')
     ohlc
 
