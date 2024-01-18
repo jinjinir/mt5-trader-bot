@@ -35,6 +35,7 @@ print('login: ', login_number)
 print('balance: ', balance)
 print('equity: ', equity)
 
+# mostly graphs to show you trends
 # get number of symbols with symbols_total()
 num_symbols = mt.symbols_total()
 num_symbols
@@ -61,3 +62,37 @@ fig = px.line(ohlc_data, x=ohlc_data['time'], y=ohlc_data['close'])
 fig.show()
 
 ohlc_data
+
+# requesting tick data
+tick_data = pd.DataFrame(mt.copy_ticks_range("EURUSD",
+                                             datetime(2023, 1, 1),
+                                             datetime.now(),
+                                             mt.COPY_TICKS_ALL))
+
+fig = px.line(tick_data, x=tick_data['time'],
+              y=tick_data['bid'], tick_data['ask'])
+fig.show()
+
+tick_data
+
+# interacting with the MT5 platform
+# total number of orders
+num_orders = mt.orders_total()
+num_orders
+
+# list of orders
+orders = mt.orders_get()
+orders
+
+# total number of positions
+num_positions = mt.positions_total()
+num_positions
+
+# list of positions
+positions = mt.positions_get()
+positions
+
+# number of history orders
+num_order_history = mt.history_orders_total(datetime(2023, 1, 1),
+                                            datetime.now())
+num_order_history
