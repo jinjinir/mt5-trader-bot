@@ -9,15 +9,23 @@ import plotly.express as px  # `pip install plotly`
 
 from datetime import datetime
 
+symbol = "EURUSD"  # change as needed e.g BTCUSD, AUDUSD, etc
+buy_vol = 2.0  # float. lot size to buy
+buy_sl = 29000.0  # flaot. stop loss
+buy_tp = 33000.0  # float. take profit
+sell_vol = 1.0  # float. lot size to sell
+sell_sl = 29000.0  # flaot. stop loss
+sell_tp = 33000.0  # float. take profit
+
 # start the platform with initialize()
 mt.initialize()
 
 # login to Trade Account with login()
 # make sure that the trade server is enabled in MT5 client terminal
 
-login =  # login user. change this value as needed.
-password = ''  # login password. change this value as needed.
-server = ''  # login server. change this value as needed.
+login = 51294955  # login user. change this value as needed
+password = '6n38WVby'  # login password. change this value as needed
+server = 'ICMarketsSC-Demo'  # login server. change this value as needed
 
 mt.login(login, password, server)
 
@@ -46,14 +54,14 @@ symbols
 
 # get symbol specifications
 # change this as needed for the symbol you want to query
-symbol_info = mt.symbol_info("EURUSD")._asdict()
+symbol_info = mt.symbol_info(symbol)._asdict()
 
 # get current symbol price
-symbol_price = mt.symbol_info_tick("EURUSD")._asdict()
+symbol_price = mt.symbol_info_tick(symbol)._asdict()
 symbol_price
 
 # ohlc_data (candlestick data)
-ohlc_data = pd.Dataframe(mt.copy_rates_range("EURUSD",
+ohlc_data = pd.Dataframe(mt.copy_rates_range(symbol,
                                              mt.TIMEFRAME_D1,
                                              datetime(2023, 1, 1),
                                              datetime.now()))
@@ -64,7 +72,7 @@ fig.show()
 ohlc_data
 
 # requesting tick data
-tick_data = pd.DataFrame(mt.copy_ticks_range("EURUSD",
+tick_data = pd.DataFrame(mt.copy_ticks_range(symbol,
                                              datetime(2023, 1, 1),
                                              datetime.now(),
                                              mt.COPY_TICKS_ALL))
@@ -74,6 +82,17 @@ fig = px.line(tick_data, x=tick_data['time'],
 fig.show()
 
 tick_data
+
+# get historical prices
+rates = mt.copy_rates_from(symbol, mt.TIMEFRAME_D1, datetime.now(), 100)
+
+ticker = symbol
+interval = mt.TIMEFRAME_D1
+from_date = datetime.now()
+no_of_rows = 100
+
+rates = mt.copy_rates_from(ticker, interval, from_date, no_of_rows)
+rates
 
 # interacting with the MT5 platform
 # total number of orders
@@ -119,12 +138,12 @@ deal_hisotry
 # ensure algo trading option is enabled in MT5 to trade with python
 request = {
     "action": mt.TRADE_ACTION_DEAL,
-    "symbol": "EURUSD",  # change as needed
-    "volume": 2.0,  # float. lot size
+    "symbol": symbol,  # change as needed
+    "volume": buy_vol,
     "type": mt.ORDER_TYPE_BUY,
-    "price": mt.symbol_info_tick("EURUSD").ask,
-    "sl": 0.0,  # float. stop loss
-    "tp": 0.0,  # float. take profit
+    "price": mt.symbol_info_tick(symbol).ask,
+    "sl": buy_sl,
+    "tp": buy_tp,
     "deviation": 20,  # integer. tolerance to when you want to place the order
     "magic": 23400,  # integer. used to identify advisor/strategies
     # and can be seen in the comments as "expert ID"
@@ -140,14 +159,14 @@ print(order)
 # close position
 request = {
     "action": mt.TRADE_ACTION_DEAL,
-    "symbol": "EURUSD",
-    "volume": 1.0,  # float. lot size
+    "symbol": symbol,
+    "volume": sell_vol,
     "type": mt.ORDER_TYPE_SELL,
     "position": 12345678,  # select the position you want to close.
     # needs to be automated?
-    "price": mt.symbol_info_tick("EURUSD").ask,
-    "sl": 0.0,  # float. stop loss
-    "tp": 0.0,  # float. take profit
+    "price": mt.symbol_info_tick(symbol).ask,
+    "sl": sell_sl,
+    "tp": sell_tp,
     "deviation": 20,  # integer
     "magic": 23400,  # used to identify advisor/strategies
     # and can be seen in the comments as "expert ID"
