@@ -9,13 +9,18 @@ import plotly.express as px  # `pip install plotly`
 
 from datetime import datetime
 
-symbol = "EURUSD"  # change as needed e.g BTCUSD, AUDUSD, etc
-buy_vol = 2.0  # float. lot size to buy
-buy_sl = 29000.0  # flaot. stop loss
-buy_tp = 33000.0  # float. take profit
-sell_vol = 1.0  # float. lot size to sell
-sell_sl = 33000.0  # flaot. stop loss
-sell_tp = 29000.0  # float. take profit
+ticker = "EURUSD"  # change as needed e.g BTCUSD, AUDUSD, etc
+qty = 2.0  # float. lot size to buy
+buy_order_type = mt.ORDER_TYPE_BUY
+sell_order_type = mt.ORDER_TYPE_SELL
+buy_price = mt.symbol_info_tick(ticker).ask
+sell_price = mt.symbol_info_tick(tikcer).bid
+sl_pct = 0.05  # stop loss percent
+tp_pct = 0.1  # take profit percent
+buy_sl = buy_price * (1-sl)# flaot. stop loss
+buy_tp = buy_price * (1+tp) # float. take profit
+sell_sl = sell_price * (1+sl)  # flaot. stop loss
+sell_tp = sell_price * (1-tp)  # float. take profit
 
 # start the platform with initialize()
 mt.initialize()
@@ -54,14 +59,14 @@ symbols
 
 # get symbol specifications
 # change this as needed for the symbol you want to query
-symbol_info = mt.symbol_info(symbol)._asdict()
+symbol_info = mt.symbol_info(ticker)._asdict()
 
 # get current symbol price
-symbol_price = mt.symbol_info_tick(symbol)._asdict()
+symbol_price = mt.symbol_info_tick(ticker)._asdict()
 symbol_price
 
 # ohlc_data (candlestick data)
-ohlc_data = pd.Dataframe(mt.copy_rates_range(symbol,
+ohlc_data = pd.Dataframe(mt.copy_rates_range(ticker,
                                              mt.TIMEFRAME_D1,
                                              datetime(2023, 1, 1),
                                              datetime.now()))
@@ -72,7 +77,7 @@ fig.show()
 ohlc_data
 
 # requesting tick data
-tick_data = pd.DataFrame(mt.copy_ticks_range(symbol,
+tick_data = pd.DataFrame(mt.copy_ticks_range(ticker,
                                              datetime(2023, 1, 1),
                                              datetime.now(),
                                              mt.COPY_TICKS_ALL))
@@ -84,7 +89,7 @@ fig.show()
 tick_data
 
 # get historical prices
-rates = mt.copy_rates_from(symbol, mt.TIMEFRAME_D1, datetime.now(), 100)
+rates = mt.copy_rates_from(ticker, mt.TIMEFRAME_D1, datetime.now(), 100)
 
 ticker = symbol
 interval = mt.TIMEFRAME_D1
@@ -141,9 +146,9 @@ deal_hisotry
 request = {
     "action": mt.TRADE_ACTION_DEAL,
     "symbol": symbol,  # change as needed
-    "volume": buy_vol,
+    "volume": qty,
     "type": mt.ORDER_TYPE_BUY,
-    "price": mt.symbol_info_tick(symbol).ask,
+    "price": buy_price,
     "sl": buy_sl,
     "tp": buy_tp,
     "deviation": 20,  # integer. tolerance to when you want to place the order
@@ -161,9 +166,9 @@ print(order)
 request = {
     "action": mt.TRADE_ACTION_DEAL,
     "symbol": symbol,
-    "volume": sell_vol,
+    "volume": qty,
     "type": mt.ORDER_TYPE_SELL,
-    "price": mt.symbol_info_tick(symbol).ask,
+    "price": sell_price,
     "sl": sell_sl,
     "tp": sell_tp,
     "deviation": 20,  # integer
@@ -187,7 +192,7 @@ request = {
     "type": mt.ORDER_TYPE_SELL,
     "position": 12345678,  # select the order ID you want to close.
     # needs to be automated?
-    "price": mt.symbol_info_tick(symbol).ask,
+    "price": buy_price,
     "magic": 23400,  # used to identify advisor/strategies
     # and can be seen in the comments as "expert ID"
     "comment": "python script close",
@@ -206,7 +211,7 @@ request = {
     "type": mt.ORDER_TYPE_BUY,
     "position": 12345678,  # select the order ID you want to close.
     # needs to be automated?
-    "price": mt.symbol_info_tick(symbol).ask,
+    "price": sell_price,
     "magic": 23400,  # used to identify advisor/strategies
     # and can be seen in the comments as "expert ID"
     "comment": "python script close",
