@@ -96,3 +96,65 @@ positions
 num_order_history = mt.history_orders_total(datetime(2023, 1, 1),
                                             datetime.now())
 num_order_history
+
+# list of history orders
+order_history = mt.history_orders_get(datetime(2023, 1, 1),
+                                      datetime(2024, 1, 1))
+order_history
+
+# number of history deals
+num_deal_history = mt.history_deals_total(datetime(2023, 1, 1),
+                                          datetime.now())
+num_deal_history
+
+# number of history deals
+deal_hisotry = mt.history_deals_get(datetime(2023, 1, 1),
+                                    datetime.now())
+deal_hisotry
+
+# send order to market
+# documentation:
+# https://www.mql5.com/en/docs/integration/python_metatrader5/mt5ordersend_py
+
+# ensure algo trading option is enabled in MT5 to trade with python
+request = {
+    "action": mt.TRADE_ACTION_DEAL,
+    "symbol": "EURUSD",  # change as needed
+    "volume": 2.0,  # float. lot size
+    "type": mt.ORDER_TYPE_BUY,
+    "price": mt.symbol_info_tick("EURUSD").ask,
+    "sl": 0.0,  # float. stop loss
+    "tp": 0.0,  # float. take profit
+    "deviation": 20,  # integer. tolerance to when you want to place the order
+    "magic": 23400,  # integer. used to identify advisor/strategies
+    # and can be seen in the comments as "expert ID"
+    "comment": "python script open",
+    "type_time": mt.ORDER_TIME_GTC,
+    "type_filling": mt.ORDER_FILLING_IOC,
+}
+
+order = mt.order_send(request)
+print(order)
+
+# ensure algo trading option is enabled in MT5 to trade with python
+# close position
+request = {
+    "action": mt.TRADE_ACTION_DEAL,
+    "symbol": "EURUSD",
+    "volume": 1.0,  # float. lot size
+    "type": mt.ORDER_TYPE_SELL,
+    "position": 12345678,  # select the position you want to close.
+    # needs to be automated?
+    "price": mt.symbol_info_tick("EURUSD").ask,
+    "sl": 0.0,  # float. stop loss
+    "tp": 0.0,  # float. take profit
+    "deviation": 20,  # integer
+    "magic": 23400,  # used to identify advisor/strategies
+    # and can be seen in the comments as "expert ID"
+    "comment": "python script close",
+    "type_time": mt.ORDER_TIME_GTC,
+    "type_filling": mt.ORDER_FILLING_IOC,
+}
+
+order = mt.order_send(request)
+print(order)
