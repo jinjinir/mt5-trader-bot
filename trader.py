@@ -34,3 +34,30 @@ print()
 print('login: ', login_number)
 print('balance: ', balance)
 print('equity: ', equity)
+
+# get number of symbols with symbols_total()
+num_symbols = mt.symbols_total()
+num_symbols
+
+# get all symbols and thier specifications
+symbols = mt.symbols_get()
+symbols
+
+# get symbol specifications
+# change this as needed for the symbol you want to query
+symbol_info = mt.symbol_info("EURUSD")._asdict()
+
+# get current symbol price
+symbol_price = mt.symbol_info_tick("EURUSD")._asdict()
+symbol_price
+
+# ohlc_data (candlestick data)
+ohlc_data = pd.Dataframe(mt.copy_rates_range("EURUSD",
+                                             mt.TIMEFRAME_D1,
+                                             datetime(2023, 1, 1),
+                                             datetime.now()))
+
+fig = px.line(ohlc_data, x=ohlc_data['time'], y=ohlc_data['close'])
+fig.show()
+
+ohlc_data
